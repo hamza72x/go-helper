@@ -1,4 +1,4 @@
-package main
+package go_helper
 
 import (
 	"fmt"
@@ -12,6 +12,7 @@ import (
 	"log"
 	"strconv"
 )
+
 
 func GetURLContent(urlStr string, userAgent string) []byte {
 
