@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"log"
 	"strconv"
+	"sort"
 )
-
 
 func GetURLContent(urlStr string, userAgent string) []byte {
 
@@ -23,26 +23,16 @@ func GetURLContent(urlStr string, userAgent string) []byte {
 
 	// Create and modify HTTP request before sending
 	request, err := http.NewRequest("GET", urlStr, nil)
-
-	if err != nil {
-		PP("Error request, err := http.NewRequest: " + err.Error())
-	}
+	ErrOSExit("request, err := http.NewRequest: ", err)
 
 	request.Header.Set("User-Agent", userAgent)
 
 	// Make request
 	response, err := client.Do(request)
-
-	if err != nil {
-		P("Error response, err := client.Do: " + err.Error())
-		PP("Please run the program again!")
-	}
+	ErrOSExit("response, err := client.Do", err)
 
 	htmlBytes, err := ioutil.ReadAll(response.Body)
-
-	if err != nil {
-		PP("Error htmlBytes, err := ioutil.ReadAll: " + err.Error())
-	}
+	ErrOSExit("htmlBytes, err := ioutil.ReadAll", err)
 
 	response.Body.Close()
 	client.CloseIdleConnections()
@@ -167,11 +157,21 @@ func P(str string) {
 	fmt.Println("+ " + str)
 	fmt.Println("-------------------------------------------------------\n")
 }
-func PErrExit(title string, err error) {
+
+func ErrOSExit(title string, err error) {
 	PErr(title, err)
 	if err != nil {
 		os.Exit(0)
 	}
+}
+
+func ContainsInt(array []int, value int) bool {
+	for _, a := range array {
+		if a == value {
+			return true
+		}
+	}
+	return false
 }
 func PErr(title string, err error) {
 	if err != nil {
@@ -180,11 +180,19 @@ func PErr(title string, err error) {
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 	}
 }
+
+func SortIntAsc(ints []int) []int {
+	sort.Slice(ints, func(i, j int) bool {
+		return ints[i] < ints[j]
+	})
+	return ints
+}
+
 func pf(a ...interface{}) (n int, err error) {
 	fmt.Println("-------------------------------------------------------")
 	return fmt.Fprintln(os.Stdout, a...)
 }
-func PP(str string) {
+func OSExit(str string) {
 	PS(str)
 	PE("I Quit :'(")
 	os.Exit(0)
