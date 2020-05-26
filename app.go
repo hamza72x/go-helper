@@ -2,7 +2,6 @@ package hel
 
 import (
 	"fmt"
-	"unicode/utf8"
 	"io/ioutil"
 	"strings"
 	"os"
@@ -81,58 +80,6 @@ func AZ_AND_NUMBER_ONLY(str string) string {
 	return reg.ReplaceAllString(str, "")
 }
 
-func CheckDomain(name string) error {
-
-	switch {
-	case len(name) == 0:
-		return nil // an empty domain name will result in a cookie without a domain restriction
-	case len(name) > 255:
-		return fmt.Errorf("cookie domain: name length is %d, can't exceed 255", len(name))
-	}
-	var l int
-	for i := 0; i < len(name); i++ {
-		b := name[i]
-		if b == '.' {
-			// check domain labels validity
-			switch {
-			case i == l:
-				return fmt.Errorf("cookie domain: invalid character '%c' at offset %d: label can't begin with a period", b, i)
-			case i-l > 63:
-				return fmt.Errorf("cookie domain: byte length of label '%s' is %d, can't exceed 63", name[l:i], i-l)
-			case name[l] == '-':
-				return fmt.Errorf("cookie domain: label '%s' at offset %d begins with a hyphen", name[l:i], l)
-			case name[i-1] == '-':
-				return fmt.Errorf("cookie domain: label '%s' at offset %d ends with a hyphen", name[l:i], l)
-			}
-			l = i + 1
-			continue
-		}
-		// test label character validity, note: tests are ordered by decreasing validity frequency
-		if !(b >= 'a' && b <= 'z' || b >= '0' && b <= '9' || b == '-' || b >= 'A' && b <= 'Z') {
-			// show the printable unicode character starting at byte offset i
-			c, _ := utf8.DecodeRuneInString(name[i:])
-			if c == utf8.RuneError {
-				return fmt.Errorf("cookie domain: invalid rune at offset %d", i)
-			}
-			return fmt.Errorf("cookie domain: invalid character '%c' at offset %d", c, i)
-		}
-	}
-	// check top level domain validity
-	switch {
-	case l == len(name):
-		return fmt.Errorf("cookie domain: missing top level domain, domain can't end with a period")
-	case len(name)-l > 63:
-		return fmt.Errorf("cookie domain: byte length of top level domain '%s' is %d, can't exceed 63", name[l:], len(name)-l)
-	case name[l] == '-':
-		return fmt.Errorf("cookie domain: top level domain '%s' at offset %d begins with a hyphen", name[l:], l)
-	case name[len(name)-1] == '-':
-		return fmt.Errorf("cookie domain: top level domain '%s' at offset %d ends with a hyphen", name[l:], l)
-	case name[l] >= '0' && name[l] <= '9':
-		return fmt.Errorf("cookie domain: top level domain '%s' at offset %d begins with a digit", name[l:], l)
-	}
-	return nil
-}
-
 func GetNonCreatedFileName(baseName string, ext string, i int) string {
 	if !FileExists(baseName + ext) {
 		return baseName + ext
@@ -141,8 +88,9 @@ func GetNonCreatedFileName(baseName string, ext string, i int) string {
 	}
 	return GetNonCreatedFileName(baseName, ext, i+1)
 }
+
 func PS(str string) {
-	fmt.Println("-------------------------------------------------------")
+	lines("")
 	fmt.Println("+ " + str)
 }
 func PM(str string) {
@@ -150,14 +98,22 @@ func PM(str string) {
 }
 func PE(str string) {
 	fmt.Println("+ " + str)
-	fmt.Println("-------------------------------------------------------\n")
+	lines("\n")
 }
 func P(str string) {
-	fmt.Println("-------------------------------------------------------")
+	lines("")
 	fmt.Println("+ " + str)
-	fmt.Println("-------------------------------------------------------\n")
+	lines("\n")
 }
 
+func Pl(a ...interface{}) {
+	lines("")
+	fmt.Fprintln(os.Stdout, a...)
+	lines("\n")
+}
+func lines(str string) {
+	fmt.Println("-------------------------------------------------------" + str)
+}
 func ErrOSExit(title string, err error) {
 	PErr(title, err)
 	if err != nil {
@@ -189,7 +145,7 @@ func SortIntAsc(ints []int) []int {
 }
 
 func pf(a ...interface{}) (n int, err error) {
-	fmt.Println("-------------------------------------------------------")
+	lines("")
 	return fmt.Fprintln(os.Stdout, a...)
 }
 func OSExit(str string) {
@@ -197,7 +153,7 @@ func OSExit(str string) {
 	PE("I Quit :'(")
 	os.Exit(0)
 }
-func ContainsStr(array []string, value string) bool {
+func StrContains(array []string, value string) bool {
 	for _, a := range array {
 		if a == value {
 			return true
