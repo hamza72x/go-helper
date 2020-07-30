@@ -13,14 +13,14 @@ import (
 	"strings"
 )
 
-func StrToFile(outFilepath, str string) err {
+func StrToFile(outFilepath, str string) error {
 	f, err := os.Create(outFilepath)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	f.WriteString(str)
-	return nil
+	_, err = f.WriteString(str)
+	return err
 }
 
 func GetURLContent(urlStr string, userAgent string) []byte {
