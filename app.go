@@ -1,17 +1,27 @@
 package hel
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strings"
-	"os"
-	"net/http"
-	"encoding/json"
-	"regexp"
 	"log"
-	"strconv"
+	"net/http"
+	"os"
+	"regexp"
 	"sort"
+	"strconv"
+	"strings"
 )
+
+func StrToFile(outFilepath, str string) err {
+	f, err := os.Create(outFilepath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	f.WriteString(str)
+	return nil
+}
 
 func GetURLContent(urlStr string, userAgent string) []byte {
 
@@ -133,7 +143,7 @@ func PErr(title string, err error) {
 	if err != nil {
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		fmt.Println("! Error " + title + ": " + err.Error())
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	}
 }
 
