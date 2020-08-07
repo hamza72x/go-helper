@@ -45,9 +45,12 @@ func MixFile(asset string, mixManifestPath string) string {
 		subFolder = "js/"
 	}
 
+	// in case following array fails
+	assetURL += subFolder + asset
+
 	for key, value := range mixManifest {
 		if strings.Contains(key, asset) {
-			assetURL += subFolder + value
+			assetURL = value
 			break
 		}
 	}
