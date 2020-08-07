@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"net/url"
 )
 
 // GormModel since *gorm.Model didn't set json keys
@@ -19,6 +20,26 @@ type GormModel struct {
 	CreatedAt time.Time  `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
+}
+
+// URLValid tests a string to determine if it is a well-structured url or not.
+// valid: http://www.golangcode.com
+// invalid: golangcode.com
+func URLValid(toTest string) bool {
+
+	_, err := url.ParseRequestURI(toTest)
+
+	if err != nil {
+		return false
+	}
+
+	u, err := url.Parse(toTest)
+
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+
+	return true
 }
 
 // MixFile returns asset file with version, ex: /public/css/app.css?id=f1bbd1956
@@ -61,6 +82,7 @@ func MixFile(asset string, mixManifestPath string) string {
 // GormSearchLikeQueryAndArgs returns queryString and queryArgs for gorm
 // to search a query in multiple columns
 // ex: columns := []string{"title", "long", "short"}
+// then call like:  db.Where(queryStr, queryArgs...).Limit(20).Find(&model)
 func GormSearchLikeQueryAndArgs(query string, columns []string) (queryStr string, queryArgs []interface{}) {
 
 	likes := []string{"%" + query, query + "%", "%" + query + "%"}
