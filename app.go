@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-// DBModel since *gorm.Model didn't set json keys
-type DBModel struct {
+// GormModel since *gorm.Model didn't set json keys
+type GormModel struct {
 	ID        uint       `gorm:"column:id;primary_key" json:"id"`
 	CreatedAt time.Time  `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updated_at"`
@@ -136,33 +136,6 @@ func PathExists(path string) bool {
 	return true
 }
 
-// FilterToAlphabetsAndNumbers filters out to [a-zA-Z0-9] of a string
-func FilterToAlphabetsAndNumbers(str string) (string, error) {
-	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
-	if err != nil {
-		return str, err
-	}
-	return reg.ReplaceAllString(str, ""), nil
-}
-
-// FilterToNumbers filters out to [0-9] of a string
-func FilterToNumbers(str string) (string, error) {
-	reg, err := regexp.Compile("[^0-9]+")
-	if err != nil {
-		return str, err
-	}
-	return reg.ReplaceAllString(str, ""), nil
-}
-
-// FilterToAlphabets filters out to [a-zA-Z] of a string
-func FilterToAlphabets(str string) (string, error) {
-	reg, err := regexp.Compile("[^a-zA-Z]+")
-	if err != nil {
-		return str, err
-	}
-	return reg.ReplaceAllString(str, ""), nil
-}
-
 // GetNonCreatedFileName returns a unique file name
 // if already file exists then -
 // it returns by appending a number (and _) before the extension
@@ -174,20 +147,6 @@ func GetNonCreatedFileName(baseName string, ext string, i int) string {
 		return baseName + "_" + strconv.Itoa(i) + ext
 	}
 	return GetNonCreatedFileName(baseName, ext, i+1)
-}
-
-// Pl prints interface with long dash
-// ---------------
-// interface print
-// ---------------
-func Pl(a ...interface{}) {
-	lines("")
-	fmt.Fprintln(os.Stdout, a...)
-	lines("\n")
-}
-
-func lines(str string) {
-	fmt.Println("-------------------------------------------------------" + str)
 }
 
 // IntContains check whether a interger contains in a interger array
@@ -218,6 +177,33 @@ func IntSortDesc(ints []int) []int {
 	return ints
 }
 
+// StrFilterToAlphabetsAndNumbers filters out to [a-zA-Z0-9] of a string
+func StrFilterToAlphabetsAndNumbers(str string) (string, error) {
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		return str, err
+	}
+	return reg.ReplaceAllString(str, ""), nil
+}
+
+// StrFilterToNumbers filters out to [0-9] of a string
+func StrFilterToNumbers(str string) (string, error) {
+	reg, err := regexp.Compile("[^0-9]+")
+	if err != nil {
+		return str, err
+	}
+	return reg.ReplaceAllString(str, ""), nil
+}
+
+// StrFilterToAlphabets filters out to [a-zA-Z] of a string
+func StrFilterToAlphabets(str string) (string, error) {
+	reg, err := regexp.Compile("[^a-zA-Z]+")
+	if err != nil {
+		return str, err
+	}
+	return reg.ReplaceAllString(str, ""), nil
+}
+
 // StrContains check whether a string contains in a string array
 func StrContains(array []string, value string) bool {
 	for _, a := range array {
@@ -236,11 +222,11 @@ func StrToArr(str string, sep string) []string {
 	)
 }
 
-// StrLimitArr splits a array in a certain limit
+// StrArrLimit splits a array in a certain limit
 // limitZB is Zero Based
 // Ex: arr = ["a", "b", "c", "d"], limitZB = 1
 // returns ["a", "b"]
-func StrLimitArr(arr []string, limitZB int) []string {
+func StrArrLimit(arr []string, limitZB int) []string {
 	var new []string
 	for i := range arr {
 		if i > limitZB {
@@ -251,11 +237,11 @@ func StrLimitArr(arr []string, limitZB int) []string {
 	return new
 }
 
-// ArrStrToStr array string to string
-func ArrStrToStr(strs []string, sep string) string {
+// StrArrToStr array string to string
+func StrArrToStr(arr []string, sep string) string {
 	var str = ""
-	l := len(strs) - 1
-	for i, v := range strs {
+	l := len(arr) - 1
+	for i, v := range arr {
 		str += v
 		if l != i {
 			str += sep
@@ -273,4 +259,18 @@ func PrettyPrint(data interface{}) {
 		return
 	}
 	fmt.Printf("%s \n", p)
+}
+
+// Pl prints interface with long dash
+// ---------------
+// interface print
+// ---------------
+func Pl(a ...interface{}) {
+	lines("")
+	fmt.Fprintln(os.Stdout, a...)
+	lines("\n")
+}
+
+func lines(str string) {
+	fmt.Println("-------------------------------------------------------" + str)
 }
