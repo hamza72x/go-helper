@@ -21,29 +21,31 @@ type GormModel struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
 }
 
-// MixFile returns asset file with version, ex: /public/css/app.css?version=hash
-// asset: app.js / app.css
-/* At boot, use this -
-func boot() {
-	fileBytes, err := hel.FileBytes("public/mix-manifest.json")
+// MixFile returns asset file with version, ex: /public/css/app.css?id=f1bbd1956
+// make sure to set:  r.Static("public", "./public")
+// asset: app.js / app.css, mixManifestPath: public/mix-manifest.json
+// panics if can't get mix file or can't unmarshal!
+func MixFile(asset string, mixManifestPath string) string {
+
+	var mixManifest map[string]string
+	fileBytes, err := FileBytes(mixManifestPath)
+
 	if err != nil {
 		panic("Error getting mix-manifest.json file")
 	}
+
 	if err := json.Unmarshal(fileBytes, &mixManifest); err != nil {
 		panic("Error Unmarshal mix-manifest.json file")
 	}
-}
-*/
-func MixFile(asset string, mixManifestData map[string]string) string {
+
 	var assetURL = "/public/"
 	var subFolder = "css/"
-	// var isCSSFile = strings.HasSuffix(asset, ".css")
-	// var isJSFile = strings.HasSuffix(asset, ".js")
+
 	if strings.HasSuffix(asset, ".js") {
 		subFolder = "js/"
 	}
 
-	for key, value := range mixManifestData {
+	for key, value := range mixManifest {
 		if strings.Contains(key, asset) {
 			assetURL += subFolder + value
 			break
