@@ -11,8 +11,18 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
+// DBModel since *gorm.Model didn't set json keys
+type DBModel struct {
+	ID        uint       `gorm:"column:id;primary_key" json:"id"`
+	CreatedAt time.Time  `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updated_at"`
+	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
+}
+
+// StrToFile write string to a file
 func StrToFile(outFilepath, str string) error {
 	f, err := os.Create(outFilepath)
 	if err != nil {
@@ -23,48 +33,65 @@ func StrToFile(outFilepath, str string) error {
 	return err
 }
 
-func GetURLContent(urlStr string, userAgent string) []byte {
-
+// GetURLContent get contents of a url
+func GetURLContent(urlStr string, userAgent string) ([]byte, error) {
 	// fmt.Printf("HTML code of %s ...\n", urlStr)
 
 	// Create HTTP client with timeout
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 
 	// Create and modify HTTP request before sending
 	request, err := http.NewRequest("GET", urlStr, nil)
-	ErrOSExit("request, err := http.NewRequest: ", err)
+	if err != nil {
+		return nil, err
+	}
 
+	// set user agent
 	request.Header.Set("User-Agent", userAgent)
 
 	// Make request
 	response, err := client.Do(request)
-	ErrOSExit("response, err := client.Do", err)
+
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
 
 	htmlBytes, err := ioutil.ReadAll(response.Body)
-	ErrOSExit("htmlBytes, err := ioutil.ReadAll", err)
+	if err != nil {
+		return nil, err
+	}
 
-	response.Body.Close()
-	client.CloseIdleConnections()
-
-	return htmlBytes
+	return htmlBytes, nil
 }
 
-func GetFileBytes(filePath string) []byte {
+// GetFileBytes get []byte of a file
+func GetFileBytes(filePath string) ([]byte, error) {
 
 	file, err := os.Open(filePath)
-	PErr("reading file "+filePath, err)
+
+	if err != nil {
+		return nil, err
+	}
 
 	b, err := ioutil.ReadAll(file)
-	PErr("ioutil.ReadAll: "+filePath, err)
+	if err != nil {
+		return nil, err
+	}
 
 	file.Close()
-	return b
+
+	return b, nil
 }
 
-func GetFileStr(path string) string {
-	return string(GetFileBytes(path))
+// GetFileStr get string content of a file
+func GetFileStr(path string) (string, error) {
+	bytes, err := GetFileBytes(path)
+	return string(bytes), err
 }
 
+// FileExists checks is file exists and not directory?
 func FileExists(filename string) bool {
 
 	info, err := os.Stat(filename)
@@ -75,6 +102,7 @@ func FileExists(filename string) bool {
 	return !info.IsDir()
 }
 
+// PathExists checks if path exists, can be a directory or file
 func PathExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
@@ -82,7 +110,8 @@ func PathExists(path string) bool {
 	return true
 }
 
-func AZ_AND_NUMBER_ONLY(str string) string {
+// FilterToAlphabetAndNumber filters out [a-zA-Z0-9] of a string
+func FilterToAlphabetAndNumber(str string) string {
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
 		log.Fatal(err)
@@ -90,6 +119,10 @@ func AZ_AND_NUMBER_ONLY(str string) string {
 	return reg.ReplaceAllString(str, "")
 }
 
+// GetNonCreatedFileName returns a unique file name
+// if already file exists then -
+// it returns by appending a number (and _) before the extension
+// ex: config.ini / config_1.ini
 func GetNonCreatedFileName(baseName string, ext string, i int) string {
 	if !FileExists(baseName + ext) {
 		return baseName + ext
@@ -99,70 +132,49 @@ func GetNonCreatedFileName(baseName string, ext string, i int) string {
 	return GetNonCreatedFileName(baseName, ext, i+1)
 }
 
-func PS(str string) {
-	lines("")
-	fmt.Println("+ " + str)
-}
-func PM(str string) {
-	fmt.Println("+ " + str)
-}
-func PE(str string) {
-	fmt.Println("+ " + str)
-	lines("\n")
-}
-func P(str string) {
-	lines("")
-	fmt.Println("+ " + str)
-	lines("\n")
-}
-
+// Pl prints interface with long dash
+// ---------------
+// interface print
+// ---------------
 func Pl(a ...interface{}) {
 	lines("")
 	fmt.Fprintln(os.Stdout, a...)
 	lines("\n")
 }
+
 func lines(str string) {
 	fmt.Println("-------------------------------------------------------" + str)
 }
-func ErrOSExit(title string, err error) {
-	PErr(title, err)
-	if err != nil {
-		os.Exit(0)
-	}
-}
 
-func ContainsInt(array []int, value int) bool {
+// IntContains check whether a interger contains in a interger array
+func IntContains(array []int, value int) bool {
+	var exists = false
 	for _, a := range array {
 		if a == value {
-			return true
+			exists = true
+			break
 		}
 	}
-	return false
-}
-func PErr(title string, err error) {
-	if err != nil {
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		fmt.Println("! Error " + title + ": " + err.Error())
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	}
+	return exists
 }
 
-func SortIntAsc(ints []int) []int {
+// IntSortAsc sorts a array of integer in asc order
+func IntSortAsc(ints []int) []int {
 	sort.Slice(ints, func(i, j int) bool {
 		return ints[i] < ints[j]
 	})
 	return ints
 }
 
-func pf(a ...interface{}) (n int, err error) {
-	lines("")
-	return fmt.Fprintln(os.Stdout, a...)
+// IntSortDesc sorts a array of integer in desc order
+func IntSortDesc(ints []int) []int {
+	sort.Slice(ints, func(i, j int) bool {
+		return ints[i] > ints[j]
+	})
+	return ints
 }
-func OSExit(str string) {
-	PS(str)
-	PE("I Quit :'(")
-	os.Exit(0)
-}
+
+// StrContains check whether a string contains in a string array
 func StrContains(array []string, value string) bool {
 	for _, a := range array {
 		if a == value {
@@ -172,12 +184,7 @@ func StrContains(array []string, value string) bool {
 	return false
 }
 
-func TempWrite(path string, str string) {
-	f, _ := os.Create(path)
-	f.WriteString(str)
-	f.Close()
-}
-
+// StrToArr string to array with TrimSpace
 func StrToArr(str string, sep string) []string {
 	return strings.Split(
 		strings.TrimSpace(str),
@@ -185,32 +192,37 @@ func StrToArr(str string, sep string) []string {
 	)
 }
 
-func LimitStrArr(strs []string, limit int) []string {
-	var newArr []string
-	for i, _ := range strs {
-		if i+1 > limit {
+// StrLimitArr splits a array in a certain limit
+// limitZB is Zero Based
+// Ex: arr = ["a", "b", "c", "d"], limitZB = 1
+// returns ["a", "b"]
+func StrLimitArr(arr []string, limitZB int) []string {
+	var new []string
+	for i := range arr {
+		if i > limitZB {
 			break
 		}
-		newArr = append(newArr, strs[i])
+		new = append(new, arr[i])
 	}
-	return newArr
+	return new
 }
 
-func ArrToStr(strs []string, sep string) string {
+// ArrStrToStr array string to string
+func ArrStrToStr(strs []string, sep string) string {
 	var str = ""
-	t := len(strs) - 1
+	l := len(strs) - 1
 	for i, v := range strs {
 		str += v
-		if t != i {
+		if l != i {
 			str += sep
 		}
 	}
 	return str
 }
 
+// PrettyPrint prints a interface with all fields
 func PrettyPrint(data interface{}) {
 	var p []byte
-	//    var err := error
 	p, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		fmt.Println(err)
