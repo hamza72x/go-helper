@@ -50,7 +50,7 @@ func MixFile(asset string, mixManifestPath string) string {
 
 	for key, value := range mixManifest {
 		if strings.Contains(key, asset) {
-			assetURL = value
+			assetURL = "/public" + value
 			break
 		}
 	}
