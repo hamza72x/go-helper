@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -20,6 +19,29 @@ type DBModel struct {
 	CreatedAt time.Time  `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
+}
+
+// GetSearchLikeQueryAndArgs returns queryString and queryArgs for gorm
+// to search a query in multiple columns
+// ex: columns := []string{"title", "long", "short"}
+func GetSearchLikeQueryAndArgs(query string, columns []string) (queryStr string, queryArgs []interface{}) {
+
+	likes := []string{"%" + query, query + "%", "%" + query + "%"}
+
+	for i := range columns {
+		for j := range likes {
+			if j == 0 && i != 0 {
+				queryStr += " OR "
+			}
+			queryStr += "`" + columns[i] + "`" + ` LIKE ?`
+			queryArgs = append(queryArgs, likes[j])
+			if len(likes)-1 != j {
+				queryStr += " OR "
+			}
+		}
+	}
+
+	return
 }
 
 // StrToFile write string to a file
@@ -56,9 +78,11 @@ func GetURLContent(urlStr string, userAgent string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	defer response.Body.Close()
 
 	htmlBytes, err := ioutil.ReadAll(response.Body)
+
 	if err != nil {
 		return nil, err
 	}
@@ -75,12 +99,13 @@ func GetFileBytes(filePath string) ([]byte, error) {
 		return nil, err
 	}
 
+	defer file.Close()
+
 	b, err := ioutil.ReadAll(file)
+
 	if err != nil {
 		return nil, err
 	}
-
-	file.Close()
 
 	return b, nil
 }
@@ -99,6 +124,7 @@ func FileExists(filename string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+
 	return !info.IsDir()
 }
 
@@ -110,13 +136,31 @@ func PathExists(path string) bool {
 	return true
 }
 
-// FilterToAlphabetAndNumber filters out [a-zA-Z0-9] of a string
-func FilterToAlphabetAndNumber(str string) string {
+// FilterToAlphabetsAndNumbers filters out to [a-zA-Z0-9] of a string
+func FilterToAlphabetsAndNumbers(str string) (string, error) {
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
-		log.Fatal(err)
+		return str, err
 	}
-	return reg.ReplaceAllString(str, "")
+	return reg.ReplaceAllString(str, ""), nil
+}
+
+// FilterToNumbers filters out to [0-9] of a string
+func FilterToNumbers(str string) (string, error) {
+	reg, err := regexp.Compile("[^0-9]+")
+	if err != nil {
+		return str, err
+	}
+	return reg.ReplaceAllString(str, ""), nil
+}
+
+// FilterToAlphabets filters out to [a-zA-Z] of a string
+func FilterToAlphabets(str string) (string, error) {
+	reg, err := regexp.Compile("[^a-zA-Z]+")
+	if err != nil {
+		return str, err
+	}
+	return reg.ReplaceAllString(str, ""), nil
 }
 
 // GetNonCreatedFileName returns a unique file name
