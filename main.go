@@ -21,10 +21,42 @@ type GormModel struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
 }
 
-// GetSearchLikeQueryAndArgs returns queryString and queryArgs for gorm
+// MixFile returns asset file with version, ex: /public/css/app.css?version=hash
+// asset: app.js / app.css
+/* At boot, use this -
+func boot() {
+	fileBytes, err := hel.FileBytes("public/mix-manifest.json")
+	if err != nil {
+		panic("Error getting mix-manifest.json file")
+	}
+	if err := json.Unmarshal(fileBytes, &mixManifest); err != nil {
+		panic("Error Unmarshal mix-manifest.json file")
+	}
+}
+*/
+func MixFile(asset string, mixManifestData map[string]string) string {
+	var assetURL = "/public/"
+	var subFolder = "css/"
+	// var isCSSFile = strings.HasSuffix(asset, ".css")
+	// var isJSFile = strings.HasSuffix(asset, ".js")
+	if strings.HasSuffix(asset, ".js") {
+		subFolder = "js/"
+	}
+
+	for key, value := range mixManifestData {
+		if strings.Contains(key, asset) {
+			assetURL += subFolder + value
+			break
+		}
+	}
+
+	return assetURL
+}
+
+// GormSearchLikeQueryAndArgs returns queryString and queryArgs for gorm
 // to search a query in multiple columns
 // ex: columns := []string{"title", "long", "short"}
-func GetSearchLikeQueryAndArgs(query string, columns []string) (queryStr string, queryArgs []interface{}) {
+func GormSearchLikeQueryAndArgs(query string, columns []string) (queryStr string, queryArgs []interface{}) {
 
 	likes := []string{"%" + query, query + "%", "%" + query + "%"}
 
@@ -55,8 +87,8 @@ func StrToFile(outFilepath, str string) error {
 	return err
 }
 
-// GetURLContent get contents of a url
-func GetURLContent(urlStr string, userAgent string) ([]byte, error) {
+// URLContent get contents of a url
+func URLContent(urlStr string, userAgent string) ([]byte, error) {
 	// fmt.Printf("HTML code of %s ...\n", urlStr)
 
 	// Create HTTP client with timeout
@@ -90,8 +122,8 @@ func GetURLContent(urlStr string, userAgent string) ([]byte, error) {
 	return htmlBytes, nil
 }
 
-// GetFileBytes get []byte of a file
-func GetFileBytes(filePath string) ([]byte, error) {
+// FileBytes get []byte of a file
+func FileBytes(filePath string) ([]byte, error) {
 
 	file, err := os.Open(filePath)
 
@@ -110,9 +142,9 @@ func GetFileBytes(filePath string) ([]byte, error) {
 	return b, nil
 }
 
-// GetFileStr get string content of a file
-func GetFileStr(path string) (string, error) {
-	bytes, err := GetFileBytes(path)
+// FileStr get string content of a file
+func FileStr(path string) (string, error) {
+	bytes, err := FileBytes(path)
 	return string(bytes), err
 }
 
@@ -136,17 +168,17 @@ func PathExists(path string) bool {
 	return true
 }
 
-// GetNonCreatedFileName returns a unique file name
+// NonCreatedFileName returns a unique file name
 // if already file exists then -
 // it returns by appending a number (and _) before the extension
 // ex: config.ini / config_1.ini
-func GetNonCreatedFileName(baseName string, ext string, i int) string {
+func NonCreatedFileName(baseName string, ext string, i int) string {
 	if !FileExists(baseName + ext) {
 		return baseName + ext
 	} else if !FileExists(baseName + "_" + strconv.Itoa(i) + ext) {
 		return baseName + "_" + strconv.Itoa(i) + ext
 	}
-	return GetNonCreatedFileName(baseName, ext, i+1)
+	return NonCreatedFileName(baseName, ext, i+1)
 }
 
 // IntContains check whether a interger contains in a interger array
