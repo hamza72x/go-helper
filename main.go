@@ -169,10 +169,30 @@ func FileBytes(filePath string) ([]byte, error) {
 	return b, nil
 }
 
+// FileBytesMust get []byte of a file
+// panics if failed
+func FileBytesMust(filePath string) []byte {
+	bytes, err := FileBytes(filePath)
+	if err != nil {
+		panic("[panic] in FileBytesMust, filePath: " + filePath + ", err: " + err.Error())
+	}
+	return bytes
+}
+
 // FileStr get string content of a file
 func FileStr(path string) (string, error) {
 	bytes, err := FileBytes(path)
 	return string(bytes), err
+}
+
+// FileStrMust get string of a file
+// panics if failed
+func FileStrMust(filePath string) string {
+	bytes, err := FileBytes(filePath)
+	if err != nil {
+		panic("[panic] in FileStrMust, filePath: " + filePath + ", err: " + err.Error())
+	}
+	return string(bytes)
 }
 
 // FileExists checks is file exists and not directory?
