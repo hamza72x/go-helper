@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
-	"net/url"
 )
 
 // GormModel since *gorm.Model didn't set json keys
@@ -19,7 +19,7 @@ type GormModel struct {
 	ID        uint       `gorm:"column:id;primary_key" json:"id"`
 	CreatedAt time.Time  `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updated_at"`
-	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
+	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"-"`
 }
 
 // URLValid tests a string to determine if it is a well-structured url or not.
