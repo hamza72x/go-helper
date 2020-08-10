@@ -173,6 +173,19 @@ func URLContent(urlStr string, userAgent string) ([]byte, error) {
 	return htmlBytes, nil
 }
 
+// URLContentMust return []bytes
+// panics if failed
+func URLContentMust(urlStr string, userAgent string) []byte {
+
+	htmlBytes, err := URLContent(urlStr, userAgent)
+
+	if err != nil {
+		panic("[URLContentMust] Error getting data - " + err.Error())
+	}
+
+	return htmlBytes
+}
+
 // FileBytes get []byte of a file
 func FileBytes(filePath string) ([]byte, error) {
 
