@@ -120,8 +120,20 @@ func StrToFile(outFilepath, str string) error {
 	return err
 }
 
+// BytesToFile write byte to a file
+func BytesToFile(outFilepath string, bytes []byte) error {
+	f, err := os.Create(outFilepath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.Write(bytes)
+	return err
+}
+
 // URLResponse get full response of a url
-func URLResponse(urlStr string, userAgent string) (http.Response, error) {
+// make sure to call `defer response.Body.Close()` in your caller function
+func URLResponse(urlStr string, userAgent string) (*http.Response, error) {
 	// fmt.Printf("HTML code of %s ...\n", urlStr)
 	if len(userAgent) == 0 {
 		userAgent = UserAgentCrawler
@@ -134,7 +146,7 @@ func URLResponse(urlStr string, userAgent string) (http.Response, error) {
 	request, err := http.NewRequest("GET", urlStr, nil)
 
 	if err != nil {
-		return http.Response{}, err
+		return &http.Response{}, err
 	}
 
 	// set user agent
@@ -144,12 +156,12 @@ func URLResponse(urlStr string, userAgent string) (http.Response, error) {
 	response, err := client.Do(request)
 
 	if err != nil {
-		return http.Response{}, err
+		return &http.Response{}, err
 	}
 
-	defer response.Body.Close()
+	// defer response.Body.Close()
 
-	return *response, nil
+	return response, nil
 }
 
 // URLContent get contents of a url
@@ -250,6 +262,14 @@ func PathExists(path string) bool {
 		return false
 	}
 	return true
+}
+
+// DirCreateIfNotExists creates a directory if not exists
+func DirCreateIfNotExists(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return os.Mkdir(path, 0755)
+	}
+	return nil
 }
 
 // NonCreatedFileName returns a unique file name
