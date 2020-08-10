@@ -124,7 +124,7 @@ func StrToFile(outFilepath, str string) error {
 func URLContent(urlStr string, userAgent string) ([]byte, error) {
 	// fmt.Printf("HTML code of %s ...\n", urlStr)
 	if len(userAgent) == 0 {
-		userAgent = "Crawler"
+		userAgent = UserAgentCrawler
 	}
 	// Create HTTP client with timeout
 	client := &http.Client{}
