@@ -14,6 +14,11 @@ import (
 	"time"
 )
 
+const (
+	// UserAgentCrawler generic crawler user agent
+	UserAgentCrawler = "Crawler"
+)
+
 // GormModel since *gorm.Model didn't set json keys
 type GormModel struct {
 	ID        uint       `gorm:"column:id;primary_key" json:"id"`
@@ -83,6 +88,7 @@ func MixFile(asset string, mixManifestPath string) string {
 // to search a query in multiple columns
 // ex: columns := []string{"title", "long", "short"}
 // then call like:  db.Where(queryStr, queryArgs...).Limit(20).Find(&model)
+// return example: queryLikes `post_title` LIKE ? OR `post_title` LIKE ? OR `post_title` LIKE ? OR `post_content` LIKE ? OR `post_content` LIKE ? OR `post_content` LIKE ? OR `post_name` LIKE ? OR `post_name` LIKE ? OR `post_name` LIKE ?
 func GormSearchLikeQueryAndArgs(query string, columns []string) (queryStr string, queryArgs []interface{}) {
 
 	likes := []string{"%" + query, query + "%", "%" + query + "%"}
@@ -117,7 +123,9 @@ func StrToFile(outFilepath, str string) error {
 // URLContent get contents of a url
 func URLContent(urlStr string, userAgent string) ([]byte, error) {
 	// fmt.Printf("HTML code of %s ...\n", urlStr)
-
+	if len(userAgent) == 0 {
+		userAgent = "Crawler"
+	}
 	// Create HTTP client with timeout
 	client := &http.Client{}
 	defer client.CloseIdleConnections()
