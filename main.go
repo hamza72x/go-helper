@@ -120,8 +120,8 @@ func StrToFile(outFilepath, str string) error {
 	return err
 }
 
-// URLContent get contents of a url
-func URLContent(urlStr string, userAgent string) ([]byte, error) {
+// URLResponse get full response of a url
+func URLResponse(urlStr string, userAgent string) (http.Response, error) {
 	// fmt.Printf("HTML code of %s ...\n", urlStr)
 	if len(userAgent) == 0 {
 		userAgent = UserAgentCrawler
@@ -132,8 +132,9 @@ func URLContent(urlStr string, userAgent string) ([]byte, error) {
 
 	// Create and modify HTTP request before sending
 	request, err := http.NewRequest("GET", urlStr, nil)
+
 	if err != nil {
-		return nil, err
+		return http.Response{}, err
 	}
 
 	// set user agent
@@ -141,6 +142,21 @@ func URLContent(urlStr string, userAgent string) ([]byte, error) {
 
 	// Make request
 	response, err := client.Do(request)
+
+	if err != nil {
+		return http.Response{}, err
+	}
+
+	defer response.Body.Close()
+
+	return *response, nil
+}
+
+// URLContent get contents of a url
+func URLContent(urlStr string, userAgent string) ([]byte, error) {
+
+	// Make request
+	response, err := URLResponse(urlStr, userAgent)
 
 	if err != nil {
 		return nil, err
