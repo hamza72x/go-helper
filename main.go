@@ -198,6 +198,14 @@ func URLContentMust(urlStr string, userAgent string) []byte {
 	return htmlBytes
 }
 
+// FileRemoveIfExists removes a file if exists
+func FileRemoveIfExists(path string) error {
+	if FileExists(path) {
+		return os.Remove(path)
+	}
+	return nil
+}
+
 // FileBytes get []byte of a file
 func FileBytes(filePath string) ([]byte, error) {
 
