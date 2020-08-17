@@ -330,6 +330,16 @@ func StrFilterToAlphabetsAndNumbers(str string) (string, error) {
 	return reg.ReplaceAllString(str, ""), nil
 }
 
+// StrFilterToAlphabetsAndNumbersMust filters out to [a-zA-Z0-9] of a string
+// panics if fails
+func StrFilterToAlphabetsAndNumbersMust(str string) string {
+	str, err := StrFilterToAlphabetsAndNumbers(str)
+	if err != nil {
+		panic("error StrFilterToAlphabetsAndNumbersMust: " + err.Error())
+	}
+	return str
+}
+
 // StrFilterToNumbers filters out to [0-9] of a string
 func StrFilterToNumbers(str string) (string, error) {
 	reg, err := regexp.Compile("[^0-9]+")
@@ -415,6 +425,13 @@ func Pl(a ...interface{}) {
 	lines("\n")
 }
 
+// PlP panic error
+func PlP(str string, err error) {
+	fmt.Println("#############################################################")
+	if err != nil {
+		panic("[hel.PlP] panicing, " + str + ", error details = " + err.Error())
+	}
+}
 func lines(str string) {
 	fmt.Println("-------------------------------------------------------" + str)
 }
