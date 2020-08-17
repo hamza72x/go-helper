@@ -231,7 +231,7 @@ func FileBytes(filePath string) ([]byte, error) {
 func FileBytesMust(filePath string) []byte {
 	bytes, err := FileBytes(filePath)
 	if err != nil {
-		panic("[panic] in FileBytesMust, filePath: " + filePath + ", err: " + err.Error())
+		panic("Error in FileBytesMust, filePath: " + filePath + ", err: " + err.Error())
 	}
 	return bytes
 }
@@ -427,8 +427,8 @@ func Pl(a ...interface{}) {
 
 // PlP panic error
 func PlP(str string, err error) {
-	fmt.Println("#############################################################")
 	if err != nil {
+		fmt.Println("#####################")
 		panic("[hel.PlP] panicing, " + str + ", error details = " + err.Error())
 	}
 }
