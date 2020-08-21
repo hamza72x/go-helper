@@ -3,6 +3,7 @@ package hel
 import (
 	"encoding/json"
 	"fmt"
+	"bufio"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -204,6 +205,30 @@ func FileRemoveIfExists(path string) error {
 		return os.Remove(path)
 	}
 	return nil
+}
+
+// FileWordList returns a file.txt in array and count of arr
+func FileWordList(path string) ([]string, int) {
+
+	var lines []string
+	var count = 0
+
+	file, err := os.Open(path)
+
+	if err != nil {
+		return nil, 0
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		count++
+		lines = append(lines, scanner.Text())
+	}
+
+	return lines, count
 }
 
 // FileBytes get []byte of a file
