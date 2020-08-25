@@ -1,6 +1,6 @@
 # Common Go Helper functions
 
-```
+```Go
 package hel
 
 import (
