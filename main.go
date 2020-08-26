@@ -1,9 +1,9 @@
 package hel
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
-	"bufio"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -197,6 +197,19 @@ func URLContentMust(urlStr string, userAgent string) []byte {
 	}
 
 	return htmlBytes
+}
+
+// URLStrMust return string of a url
+// panics if failed
+func URLStrMust(urlStr string, userAgent string) string {
+
+	htmlBytes, err := URLContent(urlStr, userAgent)
+
+	if err != nil {
+		panic("[URLStrMust] Error getting data - " + err.Error())
+	}
+
+	return string(htmlBytes)
 }
 
 // FileRemoveIfExists removes a file if exists
