@@ -1,4 +1,4 @@
-# Common Go Helper functions
+# Common Go Helper Functions
 
 ```Go
 package hel
