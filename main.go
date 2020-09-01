@@ -28,6 +28,18 @@ type GormModel struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"-"`
 }
 
+// GormModelv2 gorm model v2
+type GormModelv2 struct {
+	ID        uint      `gorm:"column:id;primary_key" json:"id"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
+}
+
+// GormModelv3 gorm model v3
+type GormModelv3 struct {
+	ID uint `gorm:"column:id;primary_key" json:"id"`
+}
+
 // URLValid tests a string to determine if it is a well-structured url or not.
 // valid: http://www.golangcode.com
 // invalid: golangcode.com
