@@ -21,6 +21,21 @@ import (
 const (
 	// UserAgentCrawler generic crawler user agent
 	UserAgentCrawler = "Crawler"
+
+	// UserAgentSamsungS9 Samsung Galaxy S9
+	UserAgentSamsungS9 = "Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36"
+
+	// UserAgentIphoneXSChrome Apple iPhone XS (Chrome)
+	UserAgentIphoneXSChrome = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/69.0.3497.105 Mobile/15E148 Safari/605.1"
+
+	// UserAgentIphoneXRSafari Apple iPhone XR (Safari)
+	UserAgentIphoneXRSafari = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1"
+
+	// UserAgentIphoneXSMaxFirefox Apple iPhone XS Max (Firefox)
+	UserAgentIphoneXSMaxFirefox = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/13.2b11866 Mobile/16A366 Safari/605.1.15"
+
+	// UserAgentChrome79Windows Chrome 79 Windows
+	UserAgentChrome79Windows = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36"
 )
 
 // GormModel since *gorm.Model didn't set json keys
@@ -346,28 +361,16 @@ func NonCreatedFileName(baseName string, ext string, i int) string {
 	return NonCreatedFileName(baseName, ext, i+1)
 }
 
-// IntContains check whether a interger contains in a interger array
-func IntContains(array []int, value int) bool {
-	var exists = false
-	for _, a := range array {
-		if a == value {
-			exists = true
-			break
-		}
-	}
-	return exists
-}
-
-// IntSortAsc sorts a array of integer in asc order
-func IntSortAsc(ints []int) []int {
+// ArrIntSortAsc sorts a array of integer in asc order
+func ArrIntSortAsc(ints []int) []int {
 	sort.Slice(ints, func(i, j int) bool {
 		return ints[i] < ints[j]
 	})
 	return ints
 }
 
-// IntSortDesc sorts a array of integer in desc order
-func IntSortDesc(ints []int) []int {
+// ArrIntSortDesc sorts a array of integer in desc order
+func ArrIntSortDesc(ints []int) []int {
 	sort.Slice(ints, func(i, j int) bool {
 		return ints[i] > ints[j]
 	})
@@ -411,16 +414,6 @@ func StrFilterToAlphabets(str string) (string, error) {
 	return reg.ReplaceAllString(str, ""), nil
 }
 
-// StrContains check whether a string contains in a string array
-func StrContains(array []string, value string) bool {
-	for _, a := range array {
-		if a == value {
-			return true
-		}
-	}
-	return false
-}
-
 // StrToArr string to array with TrimSpace
 func StrToArr(str string, sep string) []string {
 	return strings.Split(
@@ -429,11 +422,39 @@ func StrToArr(str string, sep string) []string {
 	)
 }
 
-// StrArrLimit splits a array in a certain limit
+//==============================================
+//					ARRAY
+//==============================================
+
+// ArrIntContains check whether a interger contains in a interger array
+func ArrIntContains(array []int, value int) bool {
+	var contains = false
+	for _, a := range array {
+		if a == value {
+			contains = true
+			break
+		}
+	}
+	return contains
+}
+
+// ArrStrContains check whether a string contains in a string array
+func ArrStrContains(array []string, value string) bool {
+	var contains = false
+	for _, a := range array {
+		if a == value {
+			contains = true
+			break
+		}
+	}
+	return contains
+}
+
+// ArrStrLimit splits a array in a certain limit
 // limitZB is Zero Based
 // Ex: arr = ["a", "b", "c", "d"], limitZB = 1
 // returns ["a", "b"]
-func StrArrLimit(arr []string, limitZB int) []string {
+func ArrStrLimit(arr []string, limitZB int) []string {
 	var new []string
 	for i := range arr {
 		if i > limitZB {
@@ -444,8 +465,8 @@ func StrArrLimit(arr []string, limitZB int) []string {
 	return new
 }
 
-// StrArrToStr array string to string
-func StrArrToStr(arr []string, sep string) string {
+// ArrStrToStr array string to string
+func ArrStrToStr(arr []string, sep string) string {
 	var str = ""
 	l := len(arr) - 1
 	for i, v := range arr {
