@@ -435,11 +435,22 @@ func ArrIntContains(array []int, value int) bool {
 	return contains
 }
 
+// ArrStrUnique returns array with unique values of array from a array of string
+func ArrStrUnique(array []string, value string) []string {
+	var uniques []string
+	for _, v := range array {
+		if !ArrStrContains(uniques, v) {
+			uniques = append(uniques, v)
+		}
+	}
+	return uniques
+}
+
 // ArrStrContains check whether a string contains in a string array
 func ArrStrContains(array []string, value string) bool {
 	var contains = false
-	for _, a := range array {
-		if a == value {
+	for _, v := range array {
+		if v == value {
 			contains = true
 			break
 		}
