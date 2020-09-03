@@ -436,7 +436,7 @@ func ArrIntContains(array []int, value int) bool {
 }
 
 // ArrStrUnique returns array with unique values of array from a array of string
-func ArrStrUnique(array []string, value string) []string {
+func ArrStrUnique(array []string) []string {
 	var uniques []string
 	for _, v := range array {
 		if !ArrStrContains(uniques, v) {
