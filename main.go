@@ -458,8 +458,8 @@ func ArrStrContains(array []string, value string) bool {
 	return contains
 }
 
-// ArrStrhasAnySuffix checkes whether a string has any suffixes
-func ArrStrhasAnySuffix(arr []string, str string) bool {
+// ArrStrHasAnySuffix checkes whether a string has any suffixes
+func ArrStrHasAnySuffix(arr []string, str string) bool {
 	var has = false
 	for i := range arr {
 		if strings.HasSuffix(str, arr[i]) {
@@ -470,8 +470,8 @@ func ArrStrhasAnySuffix(arr []string, str string) bool {
 	return has
 }
 
-// ArrStrhasAnyPrefix checkes whether a string has any prefixes
-func ArrStrhasAnyPrefix(arr []string, str string) bool {
+// ArrStrHasAnyPrefix checkes whether a string has any prefixes
+func ArrStrHasAnyPrefix(arr []string, str string) bool {
 	var has = false
 	for i := range arr {
 		if strings.HasPrefix(str, arr[i]) {
