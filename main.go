@@ -458,6 +458,30 @@ func ArrStrContains(array []string, value string) bool {
 	return contains
 }
 
+// ArrStrhasAnySuffix checkes whether a string has any suffixes
+func ArrStrhasAnySuffix(arr []string, str string) bool {
+	var has = false
+	for i := range arr {
+		if strings.HasSuffix(str, arr[i]) {
+			has = true
+			break
+		}
+	}
+	return has
+}
+
+// ArrStrhasAnyPrefix checkes whether a string has any prefixes
+func ArrStrhasAnyPrefix(arr []string, str string) bool {
+	var has = false
+	for i := range arr {
+		if strings.HasPrefix(str, arr[i]) {
+			has = true
+			break
+		}
+	}
+	return has
+}
+
 // ArrStrLimit splits a array in a certain limit
 // limitZB is Zero Based
 // Ex: arr = ["a", "b", "c", "d"], limitZB = 1
