@@ -146,8 +146,8 @@ func StrToFile(outFilepath, str string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	_, err = f.WriteString(str)
+	f.Close()
 	return err
 }
 
@@ -157,8 +157,8 @@ func BytesToFile(outFilepath string, bytes []byte) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	_, err = f.Write(bytes)
+	f.Close()
 	return err
 }
 
@@ -171,7 +171,6 @@ func URLResponse(urlStr string, userAgent string) (*http.Response, error) {
 	}
 	// Create HTTP client with timeout
 	client := &http.Client{}
-	defer client.CloseIdleConnections()
 
 	// Create and modify HTTP request before sending
 	request, err := http.NewRequest("GET", urlStr, nil)
@@ -191,6 +190,7 @@ func URLResponse(urlStr string, userAgent string) (*http.Response, error) {
 	}
 
 	// defer response.Body.Close()
+	client.CloseIdleConnections()
 
 	return response, nil
 }
@@ -205,13 +205,13 @@ func URLContent(urlStr string, userAgent string) ([]byte, error) {
 		return nil, err
 	}
 
-	defer response.Body.Close()
-
 	htmlBytes, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
 		return nil, err
 	}
+
+	response.Body.Close()
 
 	return htmlBytes, nil
 }
@@ -262,14 +262,14 @@ func FileWordList(path string) ([]string, int) {
 		return nil, 0
 	}
 
-	defer file.Close()
-
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
 		count++
 		lines = append(lines, scanner.Text())
 	}
+
+	file.Close()
 
 	return lines, count
 }
@@ -283,13 +283,13 @@ func FileBytes(filePath string) ([]byte, error) {
 		return nil, err
 	}
 
-	defer file.Close()
-
 	b, err := ioutil.ReadAll(file)
 
 	if err != nil {
 		return nil, err
 	}
+
+	file.Close()
 
 	return b, nil
 }
@@ -438,16 +438,51 @@ func ArrIntContains(array []int, value int) bool {
 	return contains
 }
 
+// ArrStrUnique returns array with unique values of array from a array of string
+func ArrStrUnique(array []string) []string {
+	var uniques []string
+	for _, v := range array {
+		if !ArrStrContains(uniques, v) {
+			uniques = append(uniques, v)
+		}
+	}
+	return uniques
+}
+
 // ArrStrContains check whether a string contains in a string array
 func ArrStrContains(array []string, value string) bool {
 	var contains = false
-	for _, a := range array {
-		if a == value {
+	for _, v := range array {
+		if v == value {
 			contains = true
 			break
 		}
 	}
 	return contains
+}
+
+// ArrStrHasAnySuffix checkes whether a string has any suffixes
+func ArrStrHasAnySuffix(arr []string, str string) bool {
+	var has = false
+	for i := range arr {
+		if strings.HasSuffix(str, arr[i]) {
+			has = true
+			break
+		}
+	}
+	return has
+}
+
+// ArrStrHasAnyPrefix checkes whether a string has any prefixes
+func ArrStrHasAnyPrefix(arr []string, str string) bool {
+	var has = false
+	for i := range arr {
+		if strings.HasPrefix(str, arr[i]) {
+			has = true
+			break
+		}
+	}
+	return has
 }
 
 // ArrStrLimit splits a array in a certain limit
