@@ -1,3 +1,3 @@
-module github.com/x72hoor/go-helper
+module github.com/hamza02x/go-helper
 
 go 1.15
