@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 const (
@@ -37,22 +39,22 @@ const (
 
 // GormModel since *gorm.Model didn't set json keys
 type GormModel struct {
-	ID        uint       `gorm:"column:id;primary_key" json:"id"`
-	CreatedAt time.Time  `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updated_at"`
-	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"-"`
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index"  json:"-"`
 }
 
 // GormModelv2 gorm model v2
 type GormModelv2 struct {
-	ID        uint      `gorm:"column:id;primary_key" json:"id"`
-	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
+	ID        uint      `gorm:"primarykey"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // GormModelv3 gorm model v3
 type GormModelv3 struct {
-	ID uint `gorm:"column:id;primary_key" json:"id"`
+	ID uint `gorm:"column:id;primarykey" json:"id"`
 }
 
 // URLValid tests a string to determine if it is a well-structured url or not.
