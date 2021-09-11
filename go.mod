@@ -1,4 +1,4 @@
-module github.com/hamza02x/go-helper
+module github.com/hamza72x/go-helper
 
 go 1.15
 
