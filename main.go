@@ -515,7 +515,7 @@ func ArrStrToStr(arr []string, sep string) string {
 // PrettyPrint prints a interface with all fields
 func PrettyPrint(data interface{}) {
 	var p []byte
-	p, err := json.MarshalIndent(data, "", "\t")
+	p, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		fmt.Println(err)
 		return
